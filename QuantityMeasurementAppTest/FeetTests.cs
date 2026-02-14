@@ -1,4 +1,3 @@
-using NUnit.Framework;
 using QuantityMeasurementApp.Models;
 namespace QuantityMeasurementAppTest
 {
@@ -36,6 +35,12 @@ namespace QuantityMeasurementAppTest
             var f1 = new Feet(1.0);
 
             Assert.That(f1.Equals(f1), Is.True);
+        }
+
+        [Test]
+        public void TestEquality_InvalidInput()
+        {
+            Assert.Throws<ArgumentException>(() => new Feet(double.NaN));
         }
     }
 }

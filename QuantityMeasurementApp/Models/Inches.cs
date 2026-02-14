@@ -6,22 +6,22 @@ using System.Threading.Tasks;
 
 namespace QuantityMeasurementApp.Models
 {
-    public class Feet
+    public class Inches
     {
         private readonly double _value;
 
-        public Feet(double value)
+        public Inches(double value)
         {
 
             if (double.IsNaN(value) || double.IsInfinity(value))
                 throw new ArgumentException("Invalid measurement value");
 
-            _value = value;
+            _value=value;
         }
 
         public double Value => _value;
 
-         public override bool Equals(object? obj)
+        public override bool Equals(object? obj)
         {
             if (this == obj)
                 return true;
@@ -29,7 +29,7 @@ namespace QuantityMeasurementApp.Models
             if (obj == null || GetType() != obj.GetType())
                 return false;
 
-            Feet other = (Feet)obj;
+            Inches other = (Inches)obj;
 
             return _value.CompareTo(other._value) == 0;
         }
@@ -37,5 +37,6 @@ namespace QuantityMeasurementApp.Models
         {
             return _value.GetHashCode();
         }
+
     }
 }

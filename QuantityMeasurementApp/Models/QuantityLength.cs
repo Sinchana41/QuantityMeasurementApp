@@ -12,8 +12,6 @@ namespace QuantityMeasurementApp.Models
         private readonly double _value;
         private readonly LengthUnit _unit;
 
-        private const double InchToFeet = 1.0 / 12.0;
-
         public QuantityLength(double value, LengthUnit unit)
         {
             if (double.IsNaN(value) || double.IsInfinity(value))
@@ -26,14 +24,15 @@ namespace QuantityMeasurementApp.Models
         public double Value => _value;
         public LengthUnit Unit => _unit;
 
-        private double ConvertToFeet()
+        private double ConvertToInches()
         {
             return _unit switch
             {
-                LengthUnit.Feet => _value,
-                LengthUnit.Inch => _value * InchToFeet,
-                _ => throw new ArgumentException("Unsupported unit"
-                )
+                LengthUnit.Feet => _value * 12,  //1 foot = 12 inches
+                LengthUnit.Inch => _value,      
+                LengthUnit.Yard => _value * 36,  //1 yard = 36 inches
+                LengthUnit.Centimeter => _value * 0.393701,   //  1 cm = 0.393701 inches
+                _ => throw new ArgumentOutOfRangeException(nameof(_unit), "Unsupported unit")
             };
         }
 
@@ -47,14 +46,13 @@ namespace QuantityMeasurementApp.Models
 
             var other = (QuantityLength)obj;
 
-            return this.ConvertToFeet()
-               .CompareTo(other.ConvertToFeet()) == 0;
+            return ConvertToInches()
+                   .CompareTo(other.ConvertToInches()) == 0;
         }
 
         public override int GetHashCode()
         {
-            return ConvertToFeet().GetHashCode();
+            return ConvertToInches().GetHashCode();
         }
-
     }
 }

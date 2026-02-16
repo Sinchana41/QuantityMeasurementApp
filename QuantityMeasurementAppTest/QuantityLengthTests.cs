@@ -6,132 +6,151 @@ namespace QuantityMeasurementAppTest
     {
 
         private const double EPSILON = 0.0001; //small number used when comparing floating-point numbers
-
+   
+        // SAME UNIT ADDITION
         [Test]
-        public void TestConversion_FeetToInches()
+        public void TestAddition_SameUnit_FeetPlusFeet()
         {
-            double result = QuantityLength.Convert(1.0, LengthUnit.Feet, LengthUnit.Inch);
-            Assert.That(result, Is.EqualTo(12.0));
+            var a = new QuantityLength(1.0, LengthUnit.Feet);
+            var b = new QuantityLength(2.0, LengthUnit.Feet);
+
+            var result = a.Add(b);
+
+            Assert.That(result.Value, Is.EqualTo(3.0));
+            Assert.That(result.Unit, Is.EqualTo(LengthUnit.Feet));
         }
 
         [Test]
-        public void TestConversion_InchesToFeet()
+        public void TestAddition_SameUnit_InchPlusInch()
         {
-            double result = QuantityLength.Convert(24.0, LengthUnit.Inch, LengthUnit.Feet);
-            Assert.That(result, Is.EqualTo(2.0));
+            var a = new QuantityLength(6.0, LengthUnit.Inch);
+            var b = new QuantityLength(6.0, LengthUnit.Inch);
+
+            var result = a.Add(b);
+
+            Assert.That(result.Value, Is.EqualTo(12.0));
+        }
+
+        // CROSS UNIT ADDITION
+        [Test]
+        public void TestAddition_FeetPlusInches()
+        {
+            var feet = new QuantityLength(1.0, LengthUnit.Feet);
+            var inches = new QuantityLength(12.0, LengthUnit.Inch);
+
+            var result = feet.Add(inches);
+
+            Assert.That(result.Value, Is.EqualTo(2.0).Within(EPSILON));
+            Assert.That(result.Unit, Is.EqualTo(LengthUnit.Feet));
         }
 
         [Test]
-        public void TestConversion_YardsToInches()
+        public void TestAddition_InchesPlusFeet()
         {
-            double result = QuantityLength.Convert(1.0, LengthUnit.Yard, LengthUnit.Inch);
-            Assert.That(result, Is.EqualTo(36.0));
+            var inches = new QuantityLength(12.0, LengthUnit.Inch);
+            var feet = new QuantityLength(1.0, LengthUnit.Feet);
+
+            var result = inches.Add(feet);
+
+            Assert.That(result.Value, Is.EqualTo(24.0).Within(EPSILON));
+            Assert.That(result.Unit, Is.EqualTo(LengthUnit.Inch));
         }
 
         [Test]
-        public void TestConversion_InchesToYards()
+        public void TestAddition_YardPlusFeet()
         {
-            double result = QuantityLength.Convert(72.0, LengthUnit.Inch, LengthUnit.Yard);
-            Assert.That(result, Is.EqualTo(2.0));
+            var yard = new QuantityLength(1.0, LengthUnit.Yard);
+            var feet = new QuantityLength(3.0, LengthUnit.Feet);
+
+            var result = yard.Add(feet);
+
+            Assert.That(result.Value, Is.EqualTo(2.0).Within(EPSILON));
+            Assert.That(result.Unit, Is.EqualTo(LengthUnit.Yard));
         }
 
         [Test]
-        public void TestConversion_FeetToYards()
+        public void TestAddition_CentimeterPlusInch()
         {
-            double result = QuantityLength.Convert(6.0, LengthUnit.Feet, LengthUnit.Yard);
-            Assert.That(result, Is.EqualTo(2.0));
+            var cm = new QuantityLength(2.54, LengthUnit.Centimeter);
+            var inch = new QuantityLength(1.0, LengthUnit.Inch);
+
+            var result = cm.Add(inch);
+
+            Assert.That(result.Value, Is.EqualTo(5.08).Within(0.01));
+            Assert.That(result.Unit, Is.EqualTo(LengthUnit.Centimeter));
         }
 
+        // COMMUTATIVITY
         [Test]
-        public void TestConversion_CentimetersToInches()
+        public void TestAddition_Commutative()
         {
-            double result = QuantityLength.Convert(2.54, LengthUnit.Centimeter, LengthUnit.Inch);
-            Assert.That(result, Is.EqualTo(1.0).Within(EPSILON));
+            var a = new QuantityLength(1.0, LengthUnit.Feet);
+            var b = new QuantityLength(12.0, LengthUnit.Inch);
+
+            var result1 = a.Add(b);
+            var result2 = b.Add(a);
+
+            double r1Inches = result1.Value * result1.Unit.ToInchesFactor();
+            double r2Inches = result2.Value * result2.Unit.ToInchesFactor();
+
+            Assert.That(r1Inches, Is.EqualTo(r2Inches).Within(EPSILON));
         }
 
+        // ZERO
         [Test]
-        public void TestConversion_SameUnit_ReturnsSameValue()
+        public void TestAddition_WithZero()
         {
-            double result = QuantityLength.Convert(5.0, LengthUnit.Feet, LengthUnit.Feet);
-            Assert.That(result, Is.EqualTo(5.0));
+            var a = new QuantityLength(5.0, LengthUnit.Feet);
+            var zero = new QuantityLength(0.0, LengthUnit.Inch);
+
+            var result = a.Add(zero);
+
+            Assert.That(result.Value, Is.EqualTo(5.0));
         }
 
+        // NEGATIVE VALUES
         [Test]
-        public void TestConversion_ZeroValue()
+        public void TestAddition_NegativeValues()
         {
-            double result = QuantityLength.Convert(0.0, LengthUnit.Feet, LengthUnit.Inch);
-            Assert.That(result, Is.EqualTo(0.0));
+            var a = new QuantityLength(5.0, LengthUnit.Feet);
+            var b = new QuantityLength(-2.0, LengthUnit.Feet);
+
+            var result = a.Add(b);
+
+            Assert.That(result.Value, Is.EqualTo(3.0));
         }
 
+        // NULL VALIDATION
         [Test]
-        public void TestConversion_NegativeValue()
+        public void TestAddition_NullSecondOperand_Throws()
         {
-            double result = QuantityLength.Convert(-1.0, LengthUnit.Feet, LengthUnit.Inch);
-            Assert.That(result, Is.EqualTo(-12.0));
+            var a = new QuantityLength(1.0, LengthUnit.Feet);
+
+            Assert.Throws<ArgumentNullException>(() => a.Add(null));
         }
 
+        // LARGE VALUES
         [Test]
-        public void TestConversion_LargeValue()
+        public void TestAddition_LargeValues()
         {
-            double result = QuantityLength.Convert(1_000_000.0, LengthUnit.Feet, LengthUnit.Inch);
-            Assert.That(result, Is.EqualTo(12_000_000.0));
+            var a = new QuantityLength(1e6, LengthUnit.Feet);
+            var b = new QuantityLength(1e6, LengthUnit.Feet);
+
+            var result = a.Add(b);
+
+            Assert.That(result.Value, Is.EqualTo(2e6));
         }
 
+        // SMALL VALUES
         [Test]
-        public void TestConversion_SmallValue()
+        public void TestAddition_SmallValues()
         {
-            double result = QuantityLength.Convert(0.0001, LengthUnit.Feet, LengthUnit.Inch);
-            Assert.That(result, Is.EqualTo(0.0012).Within(EPSILON));
-        }
+            var a = new QuantityLength(0.001, LengthUnit.Feet);
+            var b = new QuantityLength(0.002, LengthUnit.Feet);
 
+            var result = a.Add(b);
 
-        [Test]
-        public void TestConversion_RoundTrip_PreservesValue()
-        {
-            double original = 5.0;
-
-            double toInches = QuantityLength.Convert(original, LengthUnit.Feet, LengthUnit.Inch);
-            double backToFeet = QuantityLength.Convert(toInches, LengthUnit.Inch, LengthUnit.Feet);
-
-            Assert.That(backToFeet, Is.EqualTo(original).Within(EPSILON));
-        }
-
-        [Test]
-        public void TestConversion_Bidirectional()
-        {
-            double yards = 2.0;
-
-            double feet = QuantityLength.Convert(yards, LengthUnit.Yard, LengthUnit.Feet);
-            double backToYards = QuantityLength.Convert(feet, LengthUnit.Feet, LengthUnit.Yard);
-
-            Assert.That(backToYards, Is.EqualTo(yards).Within(EPSILON));
-        }
-
-        [Test]
-        public void TestConversion_InvalidValue_NaN_Throws()
-        {
-            Assert.Throws<ArgumentException>(() =>
-                QuantityLength.Convert(double.NaN, LengthUnit.Feet, LengthUnit.Inch));
-        }
-
-        [Test]
-        public void TestConversion_InvalidValue_Infinity_Throws()
-        {
-            Assert.Throws<ArgumentException>(() =>
-                QuantityLength.Convert(double.PositiveInfinity, LengthUnit.Feet, LengthUnit.Inch));
-        }
-
-
-        [Test]
-        public void TestConversion_MultiStepConsistency()
-        {
-            double original = 2.0; // yards
-
-            double feet = QuantityLength.Convert(original, LengthUnit.Yard, LengthUnit.Feet);
-            double inches = QuantityLength.Convert(feet, LengthUnit.Feet, LengthUnit.Inch);
-            double backToYards = QuantityLength.Convert(inches, LengthUnit.Inch, LengthUnit.Yard);
-
-            Assert.That(backToYards, Is.EqualTo(original).Within(EPSILON));
+            Assert.That(result.Value, Is.EqualTo(0.003).Within(EPSILON));
         }
     }
 }

@@ -67,11 +67,34 @@ namespace QuantityMeasurementApp.Models
             double valueInInches = value * source.ToInchesFactor();
             return valueInInches / target.ToInchesFactor();
         }
-
+        
         public QuantityLength ConvertTo(LengthUnit targetUnit)
         {
             double convertedValue = Convert(_value, _unit, targetUnit);
             return new QuantityLength(convertedValue, targetUnit);
         }
+        
+        public QuantityLength Add(QuantityLength other)
+        {
+            if (other == null)
+                throw new ArgumentNullException(nameof(other));
+
+            if (double.IsNaN(_value) || double.IsInfinity(_value) ||
+                double.IsNaN(other._value) || double.IsInfinity(other._value))
+                throw new ArgumentException("Invalid numeric value.");
+
+            // Convert both to base unit (inches)
+            double thisInInches = _value * _unit.ToInchesFactor();
+            double otherInInches = other._value * other._unit.ToInchesFactor();
+
+            // Add
+            double sumInInches = thisInInches + otherInInches;
+
+            // Convert back to unit of FIRST operand
+            double resultValue = sumInInches / _unit.ToInchesFactor();
+
+            return new QuantityLength(resultValue, _unit);
+        }
+
     }
 }

@@ -54,5 +54,24 @@ namespace QuantityMeasurementApp.Models
         {
             return ConvertToInches().GetHashCode();
         }
+
+        public static double Convert(double value, LengthUnit source, LengthUnit target)
+        {
+            if (double.IsNaN(value) || double.IsInfinity(value))
+                throw new ArgumentException("Invalid numeric value.");
+
+            if (!Enum.IsDefined(typeof(LengthUnit), source) ||
+                !Enum.IsDefined(typeof(LengthUnit), target))
+                throw new ArgumentException("Invalid unit.");
+
+            double valueInInches = value * source.ToInchesFactor();
+            return valueInInches / target.ToInchesFactor();
+        }
+
+        public QuantityLength ConvertTo(LengthUnit targetUnit)
+        {
+            double convertedValue = Convert(_value, _unit, targetUnit);
+            return new QuantityLength(convertedValue, targetUnit);
+        }
     }
 }

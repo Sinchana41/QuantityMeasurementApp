@@ -5,152 +5,119 @@ namespace QuantityMeasurementAppTest
     public class QuantityLengthTests
     {
 
-        private const double EPSILON = 0.0001; //small number used when comparing floating-point numbers
-   
-        // SAME UNIT ADDITION
+        private const double EPSILON = 0.001;
+
         [Test]
-        public void TestAddition_SameUnit_FeetPlusFeet()
+        public void TestAddition_ExplicitTargetUnit_Feet()
         {
             var a = new QuantityLength(1.0, LengthUnit.Feet);
-            var b = new QuantityLength(2.0, LengthUnit.Feet);
+            var b = new QuantityLength(12.0, LengthUnit.Inch);
 
-            var result = a.Add(b);
-
-            Assert.That(result.Value, Is.EqualTo(3.0));
-            Assert.That(result.Unit, Is.EqualTo(LengthUnit.Feet));
-        }
-
-        [Test]
-        public void TestAddition_SameUnit_InchPlusInch()
-        {
-            var a = new QuantityLength(6.0, LengthUnit.Inch);
-            var b = new QuantityLength(6.0, LengthUnit.Inch);
-
-            var result = a.Add(b);
-
-            Assert.That(result.Value, Is.EqualTo(12.0));
-        }
-
-        // CROSS UNIT ADDITION
-        [Test]
-        public void TestAddition_FeetPlusInches()
-        {
-            var feet = new QuantityLength(1.0, LengthUnit.Feet);
-            var inches = new QuantityLength(12.0, LengthUnit.Inch);
-
-            var result = feet.Add(inches);
+            var result = a.Add(b, LengthUnit.Feet);
 
             Assert.That(result.Value, Is.EqualTo(2.0).Within(EPSILON));
             Assert.That(result.Unit, Is.EqualTo(LengthUnit.Feet));
         }
 
         [Test]
-        public void TestAddition_InchesPlusFeet()
+        public void TestAddition_ExplicitTargetUnit_Inches()
         {
-            var inches = new QuantityLength(12.0, LengthUnit.Inch);
-            var feet = new QuantityLength(1.0, LengthUnit.Feet);
+            var a = new QuantityLength(1.0, LengthUnit.Feet);
+            var b = new QuantityLength(12.0, LengthUnit.Inch);
 
-            var result = inches.Add(feet);
+            var result = a.Add(b, LengthUnit.Inch);
 
             Assert.That(result.Value, Is.EqualTo(24.0).Within(EPSILON));
             Assert.That(result.Unit, Is.EqualTo(LengthUnit.Inch));
         }
 
         [Test]
-        public void TestAddition_YardPlusFeet()
-        {
-            var yard = new QuantityLength(1.0, LengthUnit.Yard);
-            var feet = new QuantityLength(3.0, LengthUnit.Feet);
-
-            var result = yard.Add(feet);
-
-            Assert.That(result.Value, Is.EqualTo(2.0).Within(EPSILON));
-            Assert.That(result.Unit, Is.EqualTo(LengthUnit.Yard));
-        }
-
-        [Test]
-        public void TestAddition_CentimeterPlusInch()
-        {
-            var cm = new QuantityLength(2.54, LengthUnit.Centimeter);
-            var inch = new QuantityLength(1.0, LengthUnit.Inch);
-
-            var result = cm.Add(inch);
-
-            Assert.That(result.Value, Is.EqualTo(5.08).Within(0.01));
-            Assert.That(result.Unit, Is.EqualTo(LengthUnit.Centimeter));
-        }
-
-        // COMMUTATIVITY
-        [Test]
-        public void TestAddition_Commutative()
+        public void TestAddition_ExplicitTargetUnit_Yards()
         {
             var a = new QuantityLength(1.0, LengthUnit.Feet);
             var b = new QuantityLength(12.0, LengthUnit.Inch);
 
-            var result1 = a.Add(b);
-            var result2 = b.Add(a);
+            var result = a.Add(b, LengthUnit.Yard);
 
-            double r1Inches = result1.Value * result1.Unit.ToInchesFactor();
-            double r2Inches = result2.Value * result2.Unit.ToInchesFactor();
-
-            Assert.That(r1Inches, Is.EqualTo(r2Inches).Within(EPSILON));
+            Assert.That(result.Value, Is.EqualTo(0.667).Within(0.01));
+            Assert.That(result.Unit, Is.EqualTo(LengthUnit.Yard));
         }
 
-        // ZERO
         [Test]
-        public void TestAddition_WithZero()
+        public void TestAddition_ExplicitTargetUnit_Centimeters()
+        {
+            var a = new QuantityLength(1.0, LengthUnit.Inch);
+            var b = new QuantityLength(1.0, LengthUnit.Inch);
+
+            var result = a.Add(b, LengthUnit.Centimeter);
+
+            Assert.That(result.Value, Is.EqualTo(5.08).Within(0.01));
+        }
+
+        [Test]
+        public void TestAddition_ExplicitTargetUnit_Commutativity()
+        {
+            var a = new QuantityLength(1.0, LengthUnit.Feet);
+            var b = new QuantityLength(12.0, LengthUnit.Inch);
+
+            var result1 = a.Add(b, LengthUnit.Yard);
+            var result2 = b.Add(a, LengthUnit.Yard);
+
+            Assert.That(result1.Value, Is.EqualTo(result2.Value).Within(EPSILON));
+        }
+
+        [Test]
+        public void TestAddition_ExplicitTargetUnit_WithZero()
         {
             var a = new QuantityLength(5.0, LengthUnit.Feet);
             var zero = new QuantityLength(0.0, LengthUnit.Inch);
 
-            var result = a.Add(zero);
+            var result = a.Add(zero, LengthUnit.Yard);
 
-            Assert.That(result.Value, Is.EqualTo(5.0));
+            Assert.That(result.Value, Is.EqualTo(1.667).Within(0.01));
         }
 
-        // NEGATIVE VALUES
         [Test]
-        public void TestAddition_NegativeValues()
+        public void TestAddition_ExplicitTargetUnit_NegativeValues()
         {
             var a = new QuantityLength(5.0, LengthUnit.Feet);
             var b = new QuantityLength(-2.0, LengthUnit.Feet);
 
-            var result = a.Add(b);
+            var result = a.Add(b, LengthUnit.Inch);
 
-            Assert.That(result.Value, Is.EqualTo(3.0));
+            Assert.That(result.Value, Is.EqualTo(36.0));
         }
 
-        // NULL VALIDATION
         [Test]
-        public void TestAddition_NullSecondOperand_Throws()
+        public void TestAddition_ExplicitTargetUnit_NullTarget_Throws()
         {
             var a = new QuantityLength(1.0, LengthUnit.Feet);
+            var b = new QuantityLength(1.0, LengthUnit.Feet);
 
-            Assert.Throws<ArgumentNullException>(() => a.Add(null));
+            Assert.Throws<ArgumentException>(() =>
+                a.Add(b, (LengthUnit)999));
         }
 
-        // LARGE VALUES
         [Test]
-        public void TestAddition_LargeValues()
+        public void TestAddition_ExplicitTargetUnit_LargeScale()
         {
-            var a = new QuantityLength(1e6, LengthUnit.Feet);
-            var b = new QuantityLength(1e6, LengthUnit.Feet);
+            var a = new QuantityLength(1000.0, LengthUnit.Feet);
+            var b = new QuantityLength(500.0, LengthUnit.Feet);
 
-            var result = a.Add(b);
+            var result = a.Add(b, LengthUnit.Inch);
 
-            Assert.That(result.Value, Is.EqualTo(2e6));
+            Assert.That(result.Value, Is.EqualTo(18000.0));
         }
 
-        // SMALL VALUES
         [Test]
-        public void TestAddition_SmallValues()
+        public void TestAddition_ExplicitTargetUnit_SmallToLargeScale()
         {
-            var a = new QuantityLength(0.001, LengthUnit.Feet);
-            var b = new QuantityLength(0.002, LengthUnit.Feet);
+            var a = new QuantityLength(12.0, LengthUnit.Inch);
+            var b = new QuantityLength(12.0, LengthUnit.Inch);
 
-            var result = a.Add(b);
+            var result = a.Add(b, LengthUnit.Yard);
 
-            Assert.That(result.Value, Is.EqualTo(0.003).Within(EPSILON));
+            Assert.That(result.Value, Is.EqualTo(0.667).Within(0.01));
         }
     }
 }

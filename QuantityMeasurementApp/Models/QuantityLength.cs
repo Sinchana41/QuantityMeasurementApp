@@ -8,125 +8,49 @@ namespace QuantityMeasurementApp.Models
 {
     public class QuantityLength
     {
-
-        private readonly double _value;
-        private readonly LengthUnit _unit;
+        public readonly double _value;
+        public readonly LengthUnit _unit;
+        
 
         public QuantityLength(double value, LengthUnit unit)
         {
-            if (double.IsNaN(value) || double.IsInfinity(value))
-                throw new ArgumentException("Invalid numeric value.");
+            if (double.IsNaN(value))
+                throw new ArgumentException("Invalid value");
 
             _value = value;
             _unit = unit;
         }
 
-        public double Value => _value;
-        public LengthUnit Unit => _unit;
-
-        private double ConvertToInches()
-        {
-            return _unit switch
-            {
-                LengthUnit.Feet => _value * 12,  //1 foot = 12 inches
-                LengthUnit.Inch => _value,      
-                LengthUnit.Yard => _value * 36,  //1 yard = 36 inches
-                LengthUnit.Centimeter => _value * 0.393701,   //  1 cm = 0.393701 inches
-                _ => throw new ArgumentOutOfRangeException(nameof(_unit), "Unsupported unit")
-            };
-        }
-
-        public override bool Equals(object? obj)
-        {
-            if (this == obj)
-                return true;
-
-            if (obj == null || GetType() != obj.GetType())
-                return false;
-
-            var other = (QuantityLength)obj;
-
-            return ConvertToInches()
-                   .CompareTo(other.ConvertToInches()) == 0;
-        }
-
-        public override int GetHashCode()
-        {
-            return ConvertToInches().GetHashCode();
-        }
-
-        public static double Convert(double value, LengthUnit source, LengthUnit target)
-        {
-            if (double.IsNaN(value) || double.IsInfinity(value))
-                throw new ArgumentException("Invalid numeric value.");
-
-            if (!Enum.IsDefined(typeof(LengthUnit), source) ||
-                !Enum.IsDefined(typeof(LengthUnit), target))
-                throw new ArgumentException("Invalid unit.");
-
-            double valueInInches = value * source.ToInchesFactor();
-            return valueInInches / target.ToInchesFactor();
-        }
-        
-        public QuantityLength ConvertTo(LengthUnit targetUnit)
-        {
-            double convertedValue = Convert(_value, _unit, targetUnit);
-            return new QuantityLength(convertedValue, targetUnit);
-        }
-        
-        public QuantityLength Add(QuantityLength other)
+        public bool Equals(QuantityLength other)
         {
             if (other == null)
-                throw new ArgumentNullException(nameof(other));
+                return false;
 
-            if (double.IsNaN(_value) || double.IsInfinity(_value) ||
-                double.IsNaN(other._value) || double.IsInfinity(other._value))
-                throw new ArgumentException("Invalid numeric value.");
+            double base1 = _unit.ConvertToBaseUnit(_value);
+            double base2 = other._unit.ConvertToBaseUnit(other._value);
 
-            
-            double thisInInches = _value * _unit.ToInchesFactor();
-            double otherInInches = other._value * other._unit.ToInchesFactor();
-
-           
-            double sumInInches = thisInInches + otherInInches;
-
-            // Convert back to unit of FIRST operand
-            double resultValue = sumInInches / _unit.ToInchesFactor();
-
-            return new QuantityLength(resultValue, _unit);
+            return Math.Abs(base1 - base2) < 0.0001;
         }
 
-        private static QuantityLength AddInternal(
-        QuantityLength first,
-        QuantityLength second,
-        LengthUnit targetUnit)
+        public QuantityLength ConvertTo(LengthUnit targetUnit)
         {
-            if (first == null || second == null)
-                throw new ArgumentNullException("Operands cannot be null.");
+            double baseValue = _unit.ConvertToBaseUnit(_value);
+            double converted = targetUnit.ConvertFromBaseUnit(baseValue);
 
-            if (!Enum.IsDefined(typeof(LengthUnit), targetUnit))
-                throw new ArgumentException("Invalid target unit.");
-
-            if (double.IsNaN(first._value) || double.IsInfinity(first._value) ||
-                double.IsNaN(second._value) || double.IsInfinity(second._value))
-                throw new ArgumentException("Invalid numeric value.");
-
-           
-            double firstInInches = first._value * first._unit.ToInchesFactor();
-            double secondInInches = second._value * second._unit.ToInchesFactor();
-
-            double sumInInches = firstInInches + secondInInches;
-
-            // Convert to target unit
-            double resultValue = sumInInches / targetUnit.ToInchesFactor();
-
-            return new QuantityLength(resultValue, targetUnit);
+            return new QuantityLength(converted, targetUnit);
         }
 
         public QuantityLength Add(QuantityLength other, LengthUnit targetUnit)
         {
-            return AddInternal(this, other, targetUnit);
-        }
+            double base1 = _unit.ConvertToBaseUnit(_value);
+            double base2 = other._unit.ConvertToBaseUnit(other._value);
 
+            double sum = base1 + base2;
+
+            double result = targetUnit.ConvertFromBaseUnit(sum);
+
+            return new QuantityLength(result, targetUnit);
+        }
     }
+
 }

@@ -33,6 +33,11 @@ namespace QuantityMeasurementApp.Models
             };
         }
 
+        public static string GetUnitName(this LengthUnit unit)
+        {
+            return unit.ToString();
+        }
+
     }
 }
 

@@ -30,5 +30,10 @@ namespace QuantityMeasurementApp.Models
                 _ => throw new ArgumentException("Invalid unit")
             };
         }
+
+        public static string GetUnitName(this LengthUnitWM unit)
+        {
+            return unit.ToString();
+        }
     }
 }

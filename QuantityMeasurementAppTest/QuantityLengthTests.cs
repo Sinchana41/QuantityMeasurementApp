@@ -148,8 +148,103 @@ namespace QuantityMeasurementAppTest
                 Assert.That(result.Value, Is.EqualTo(1.5).Within(EPSILON));
             }
 
+        // Conversion Tests
+
+        [Test]
+        public void TestConversion_LitreToMillilitre()
+        {
+            var a = new Quantity<LengthUnitVM>(1.0, LengthUnitVM.Litre);
+
+            var result = a.ConvertTo(LengthUnitVM.Millilitre);
+
+            Assert.That(result.Value,
+                Is.EqualTo(1000.0).Within(EPSILON));
+        }
+
+        [Test]
+        public void TestConversion_MillilitreToLitre()
+        {
+            var a = new Quantity<LengthUnitVM>(1000.0, LengthUnitVM.Millilitre);
+
+            var result = a.ConvertTo(LengthUnitVM.Litre);
+
+            Assert.That(result.Value,
+                Is.EqualTo(1.0).Within(EPSILON));
+        }
+
+        [Test]
+        public void TestConversion_GallonToLitre()
+        {
+            var a = new Quantity<LengthUnitVM>(1.0, LengthUnitVM.Gallon);
+
+            var result = a.ConvertTo(LengthUnitVM.Litre);
+
+            Assert.That(result.Value,
+                Is.EqualTo(3.78541).Within(0.01));
+        }
+
+        [Test]
+        public void TestConversion_LitreToGallon()
+        {
+            var a = new Quantity<LengthUnitVM>(3.78541, LengthUnitVM.Litre);
+
+            var result = a.ConvertTo(LengthUnitVM.Gallon);
+
+            Assert.That(result.Value,
+                Is.EqualTo(1.0).Within(0.01));
+        }
+
+        // Addition Tests
+
+        [Test]
+        public void TestAddition_LitrePlusLitre()
+        {
+            var a = new Quantity<LengthUnitVM>(1.0, LengthUnitVM.Litre);
+            var b = new Quantity<LengthUnitVM>(2.0, LengthUnitVM.Litre);
+
+            var result = a.Add(b);
+
+            Assert.That(result.Value,
+                Is.EqualTo(3.0).Within(EPSILON));
+        }
+
+        [Test]
+        public void TestAddition_LitrePlusMillilitre()
+        {
+            var a = new Quantity<LengthUnitVM>(1.0, LengthUnitVM.Litre);
+            var b = new Quantity<LengthUnitVM>(1000.0, LengthUnitVM.Millilitre);
+
+            var result = a.Add(b);
+
+            Assert.That(result.Value,
+                Is.EqualTo(2.0).Within(EPSILON));
+        }
+
+        [Test]
+        public void TestAddition_ExplicitTargetUnit()
+        {
+            var a = new Quantity<LengthUnitVM>(1.0, LengthUnitVM.Litre);
+            var b = new Quantity<LengthUnitVM>(1000.0, LengthUnitVM.Millilitre);
+
+            var result = a.Add(b, LengthUnitVM.Millilitre);
+
+            Assert.That(result.Value,
+                Is.EqualTo(2000.0).Within(EPSILON));
+        }
+
+        [Test]
+        public void TestAddition_GallonPlusLitre()
+        {
+            var a = new Quantity<LengthUnitVM>(1.0, LengthUnitVM.Gallon);
+            var b = new Quantity<LengthUnitVM>(3.78541, LengthUnitVM.Litre);
+
+            var result = a.Add(b, LengthUnitVM.Gallon);
+
+            Assert.That(result.Value,
+                Is.EqualTo(2.0).Within(0.01));
         }
     }
+}
 
 
 

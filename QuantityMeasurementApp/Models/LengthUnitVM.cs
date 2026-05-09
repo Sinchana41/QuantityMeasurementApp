@@ -6,13 +6,10 @@ using System.Threading.Tasks;
 
 namespace QuantityMeasurementApp.Models
 {
-    public interface IMeasurable
+    public enum LengthUnitVM
     {
-        double ConvertToBaseUnit(double value);
-
-        double ConvertFromBaseUnit(double baseValue);
-
-        string GetUnitName();
-
+        Litre,
+        Millilitre,
+        Gallon
     }
 }

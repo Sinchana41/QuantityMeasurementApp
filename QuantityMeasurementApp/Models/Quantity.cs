@@ -79,7 +79,10 @@ namespace QuantityMeasurementApp.Models
                 if (unit is LengthUnitWM weightUnit)
                     return weightUnit.ConvertToBaseUnit(value);
 
-                throw new ArgumentException("Unsupported unit type");
+               if (unit is LengthUnitVM volumeUnit)
+                   return volumeUnit.ConvertToBaseUnit(value);
+
+            throw new ArgumentException("Unsupported unit type");
             }
 
             private double ConvertFromBase(double value, U unit)
@@ -90,7 +93,11 @@ namespace QuantityMeasurementApp.Models
                 if (unit is LengthUnitWM weightUnit)
                     return weightUnit.ConvertFromBaseUnit(value);
 
-                throw new ArgumentException("Unsupported unit type");
+                if (unit is LengthUnitVM volumeUnit)
+                   return volumeUnit.ConvertFromBaseUnit(value);
+
+
+            throw new ArgumentException("Unsupported unit type");
             }
 
             public override int GetHashCode()
@@ -102,6 +109,7 @@ namespace QuantityMeasurementApp.Models
             {
                 return $"Quantity(Value={Value}, Unit={Unit})";
             }
+
         }
     }
 

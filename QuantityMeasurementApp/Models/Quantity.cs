@@ -110,7 +110,56 @@ namespace QuantityMeasurementApp.Models
                 return $"Quantity(Value={Value}, Unit={Unit})";
             }
 
+        // Subtraction Methods
+
+        public Quantity<U> Subtract(Quantity<U> other)
+        {
+            return Subtract(other, Unit);
         }
+
+        public Quantity<U> Subtract(Quantity<U> other, U targetUnit)
+        {
+            if (other == null)
+                throw new ArgumentException("Other quantity cannot be null");
+
+            if (targetUnit == null)
+                throw new ArgumentException("Target unit cannot be null");
+
+            if (Unit!.GetType() != other.Unit!.GetType())
+                throw new ArgumentException("Cross-category subtraction not allowed");
+
+            double base1 = ConvertToBase(Value, Unit);
+            double base2 = ConvertToBase(other.Value, other.Unit);
+
+            double difference = base1 - base2;
+
+            double result = ConvertFromBase(difference, targetUnit);
+
+            // Round to 2 decimal places
+            result = Math.Round(result, 2);
+
+            return new Quantity<U>(result, targetUnit);
+        }
+
+        // Division Method
+
+        public double Divide(Quantity<U> other)
+        {
+            if (other == null)
+                throw new ArgumentException("Other quantity cannot be null");
+
+            if (Unit!.GetType() != other.Unit!.GetType())
+                throw new ArgumentException("Cross-category division not allowed");
+
+            double base1 = ConvertToBase(Value, Unit);
+            double base2 = ConvertToBase(other.Value, other.Unit);
+
+            if (Math.Abs(base2) < EPSILON)
+                throw new ArithmeticException("Cannot divide by zero");
+
+            return base1 / base2;
+        }
+    }
     }
 
 
